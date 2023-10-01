@@ -1,9 +1,12 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Sequence = DG.Tweening.Sequence;
 
 public class ItemGrid : MonoBehaviour
 {
@@ -50,6 +53,8 @@ public class ItemGrid : MonoBehaviour
                     foreach (var item in horizontalMatches)
                     {
                         PickupItem(item.myPos.x, item.myPos.y);
+                        print(item.myId);
+
                         Destroy(item.gameObject);
                     }
                 }
@@ -59,27 +64,172 @@ public class ItemGrid : MonoBehaviour
                     foreach (var item in verticalMatches)
                     {
                         PickupItem(item.myPos.x, item.myPos.y);
+                        print(item.myId);
                         Destroy(item.gameObject);
                     }
                 }
             }
         }
     }
-    //public void FillEmptySpaces()
-    //{
-    //    for (int x = 0; x < fixedWidth; x++)
-    //    {
-    //        for (int y = 0; y < fixedHeight; y++)
-    //        {
-    //            if (!CheckIfSlotFull(x, y))
-    //            {
-    //                Debug.Log(CheckIfSlotFull(x, y) + "," + x + "," + y);
-    //                FruitItem randomFruit = GetRandomItem(FruitManager.Instance.fruitItemPrefabs);
-    //                InstantiataAndPlaceItem(randomFruit, x, y);
-    //            }
-    //        }
-    //    }
-    //}
+
+    public bool IsThereAnyMatch()
+    {
+        for (int i = 0; i < fixedWidth; i++)
+        {
+            for (int j = 0; j < fixedHeight; j++)
+            {
+                FruitItem currentItem = fruitItemSlot[i, j];
+                if (currentItem == null)
+                {
+                    continue;
+                }
+
+                List<FruitItem> horizontalMatches = GetMatchesInDirection(currentItem, Vector2Int.right);
+                List<FruitItem> verticalMatches = GetMatchesInDirection(currentItem, Vector2Int.up);
+
+                if (horizontalMatches.Count >= 3)
+                {
+                    return true;
+                }
+
+                if (verticalMatches.Count >= 3)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+
+
+    }
+    int lastY = 0;
+
+    //Coroutine planB;
+    public IEnumerator FillEmptySpaces()
+    {
+        //if (planB != null)
+        //{
+        //    StopCoroutine(planB);
+        //}
+        //Sequence sequence = DOTween.Sequence();
+        int twinCount = 0;
+        List<FruitItem> FruitItems = new List<FruitItem>();
+        List<Vector3> newPosL = new List<Vector3>();
+        List<Vector2Int> newPosGrid = new List<Vector2Int>();
+
+        lastY = 0;
+        for (int y = HeightDifference() - 1; y <= gridSizeHeight; y++)
+        {
+            for (int x = WidthDifference() - 1; x <= gridSizeWidth; x++)
+            {
+                if (!CheckIfSlotFull(x, y))
+                {
+                    for (int i = y + 1; i <= gridSizeHeight; i++)
+                    {
+                        if (!CheckIfSlotFull(x, i))
+                        {
+                            continue;
+                        }
+
+                        FruitItem fruit = PickupItem(x, i);
+                        DoAnimationMove(fruit, x, y);
+                        break;
+
+                    }
+
+                }
+            }
+        }
+        for (int y = HeightDifference() - 1; y <= gridSizeHeight; y++)
+        {
+            for (int x = WidthDifference() - 1; x <= gridSizeWidth; x++)
+
+            {
+                if (!CheckIfSlotFull(x, y))
+                {
+                    FruitItem randomFruit = GetRandomItem(FruitManager.Instance.fruitItemPrefabs);
+                    InstantiataAndPlaceItem(randomFruit, x, fixedHeight - 1);
+                    FruitItem fruitItem = PickupItem(x, fixedHeight - 1);
+                    DoAnimationMove(fruitItem, x, y);
+
+                }
+            }
+        }
+
+        yield return StartCoroutine(DoCheckSystemLerping());
+        void DoAnimationMove(FruitItem fruit, int x, int y)
+        {
+
+            if (lastY != fruit.myPos.y)
+            {
+                twinCount++;
+                lastY = fruit.myPos.y;
+            }
+
+
+            PlaceItemWithoutMove(fruit, x, y);
+            Vector3 newPos = GetWorldPosByGridPos(x, y);
+            FruitItems.Add(fruit);
+            newPosL.Add(newPos);
+            newPosGrid.Add(new Vector2Int(x, y));
+            //sequence.Insert(twinCount * 0.05f, fruit.transform.DOMoveY(newPos.y, 0.5f).SetEase(Ease.OutBack));
+            //sequence.AppendInterval(0.01f);
+            //sequence.Join(fruit.transform.DOMoveY(newPos.y, 1).SetEase(Ease.OutBack).SetSpeedBased());
+            //sequence.OnComplete(() =>
+            //{
+            //    Debug.Log("sgf");
+            //    MovementManager.Instance.ActivateInput();
+            //});
+        }
+        IEnumerator DoCheckSystemLerping()
+        {
+            //yield return new WaitForSeconds(3);
+            bool[] canBreak = new bool[FruitItems.Count];
+            while (!isAllTrue(canBreak)) // Lerp And 
+            {
+                for (int i = 0; i < FruitItems.Count; i++)
+                {
+                    if (canBreak[i] == true)
+                        continue;
+                    FruitItem item = FruitItems[i];
+               
+                    item.transform.position = Vector3.Lerp(item.transform.position, newPosL[i], Time.deltaTime * (10 - newPosGrid[i].y));
+                    if (Vector3.Distance(newPosL[i], item.transform.position) <= 1f)
+                        canBreak[i] = true;
+                }
+                yield return null;
+            }
+
+
+            bool isAllTrue(bool[] bools)
+            {
+                foreach (var item in bools)
+                {
+                    if (item == false)
+                        return false;
+                }
+                return true;
+            }
+        }
+
+
+    }
+
+    public void MatchCheck()
+    {
+        StartCoroutine(MatchCheckCoroutine());
+    }
+    private IEnumerator MatchCheckCoroutine()
+    {
+        while (IsThereAnyMatch())
+        {
+            CheckMatches();
+            yield return FillEmptySpaces();
+            yield return null;
+        }
+        MovementManager.Instance.ActivateInput();
+
+    }
     private List<FruitItem> GetMatchesInDirection(FruitItem startItem, Vector2Int direction)
     {
         List<FruitItem> matches = new List<FruitItem>();
@@ -105,7 +255,6 @@ public class ItemGrid : MonoBehaviour
 
     private void SpawnFruitsForVisibleGrids()
     {
-
         for (int i = 1; i < fixedWidth - 1; i++)
         {
             for (int j = 1; j < fixedHeight - 1; j++)
@@ -189,7 +338,14 @@ public class ItemGrid : MonoBehaviour
 
         rectTransform.localPosition = position;
     }
+    public void PlaceItemWithoutMove(FruitItem fruitItem, int posX, int posY)
+    {
+        RectTransform rectTransform = fruitItem.GetComponent<RectTransform>();
+        rectTransform.SetParent(gridTransform);
+        fruitItemSlot[posX, posY] = fruitItem;
+        fruitItem.myPos = new Vector2Int(posX, posY);
 
+    }
     public T GetRandomItem<T>(IList<T> items) //generic, extentions
     {
         int index = UnityEngine.Random.Range(0, items.Count);

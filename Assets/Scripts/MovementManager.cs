@@ -172,13 +172,14 @@ public class MovementManager : MonoBehaviour
     {
         if (moveEndedCOStarted == true)
             return;
-        if (itemsToMove.Count <= 0)
-            return;
+ 
         moveStarted = false;
         directionCalculated = false;
         curCoolDown = 0;
         offsets.Clear();
         scroll.SetInteraction(false);
+        if (itemsToMove.Count <= 0)
+            return;
         StartCoroutine(OnMoveEndedCoroutine());
     }
 
@@ -189,28 +190,36 @@ public class MovementManager : MonoBehaviour
         itemsToMove.Clear();
         while (scroll.doScrolling)
             yield return null;
-
-
         List<FruitItem> items = new List<FruitItem>();
         List<FruitItem> itemsInGrid = new List<FruitItem>();
+        List<Transform> itemsNOTInGridT = new List<Transform>();
+        List<Vector2Int> tileGridPositions = new List<Vector2Int>();
+        List<Vector3> snapPositions = new List<Vector3>();
+
+
         scroll.allItemList.ForEach(x => items.Add(x.GetComponent<FruitItem>())); //Initialize a list and get all fruits with fruit component
-        foreach (var item in items) //Initialize a list and get all fruits where fruits in the grid
+        for (int i = 0; i < items.Count; i++)
         {
+            FruitItem item = items[i];
             if (GridManager.Instance.grid.AmIInGrid(item) == false)
+            {
+                itemsNOTInGridT.Add(item.transform);
                 continue;
+            }
+            Vector2Int itemPosInGrid = GridManager.Instance.grid.GetTileGridPosition(item.transform.position);
+            if (tileGridPositions.Contains(itemPosInGrid))
+            {
+                itemsNOTInGridT.Add(item.transform);
+                continue;
+            }
             itemsInGrid.Add(item);
-        }
 
-        Vector2Int[] tileGridPositions = new Vector2Int[itemsInGrid.Count];
-        Vector3[] snapPositions = new Vector3[itemsInGrid.Count];
-        for (int i = 0; i < itemsInGrid.Count; i++) //Get Necessary Positions
-        {
-            FruitItem item = itemsInGrid[i];
             Vector2 screenPosOfItem = item.transform.position;
-            tileGridPositions[i] = GridManager.Instance.grid.GetTileGridPosition(screenPosOfItem);
-            snapPositions[i] = GridManager.Instance.grid.GetWorldPosByGridPos(tileGridPositions[i].x, tileGridPositions[i].y);
+            tileGridPositions.Add(GridManager.Instance.grid.GetTileGridPosition(screenPosOfItem));
+            snapPositions.Add(GridManager.Instance.grid.GetWorldPosByGridPos(tileGridPositions[tileGridPositions.Count - 1].x, tileGridPositions[tileGridPositions.Count - 1].y));
 
         }
+        scroll.HideUnused(itemsNOTInGridT);
 
         bool canBreak = false;
         while (!canBreak) // Lerp And 
@@ -230,11 +239,12 @@ public class MovementManager : MonoBehaviour
             GridManager.Instance.grid.PlaceItem(item, tileGridPositions[i].x, tileGridPositions[i].y);
         }
         scroll.ClearRemainings();
-        moveEndedCOStarted = false;
-        scroll.SetInteraction(true);
-        GridManager.Instance.grid.CheckMatches();
-        //GridManager.Instance.grid.FillEmptySpaces();
-
+        GridManager.Instance.grid.MatchCheck();
     }
 
+    public void ActivateInput()
+    {
+        moveEndedCOStarted = false;
+        scroll.SetInteraction(true);
+    }
 }

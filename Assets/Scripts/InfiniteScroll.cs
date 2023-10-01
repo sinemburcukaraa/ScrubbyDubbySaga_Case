@@ -88,19 +88,19 @@ public class InfiniteScroll : MonoBehaviour
         OldVelocity = Vector2.zero;
         //int ItemsToAdd = Mathf.CeilToInt(viewPortTransform.rect.width / (ItemList[0].rect.width + HLG.spacing));
         int ItemsToAdd;
-        if(direction.x > 0)
-            ItemsToAdd = (int)(viewPortTransform.rect.width / (ItemList[0].rect.width + HLG.spacing));
+        if (direction.x > 0)
+            ItemsToAdd = Mathf.CeilToInt(viewPortTransform.rect.width / (ItemList[0].rect.width + HLG.spacing));
         else
-            ItemsToAdd = (int)(viewPortTransform.rect.height / (ItemList[0].rect.height + HLG.spacing));
+            ItemsToAdd = Mathf.CeilToInt(viewPortTransform.rect.height / (ItemList[0].rect.height + HLG.spacing));
 
         for (int i = 0; i < ItemsToAdd; i++)
-{
+        {
             RectTransform RT = Instantiate(ItemList[i % ItemList.Length], contentPanelTransform);
             RT.SetAsLastSibling();
             allItemList.Add(RT);
         }
         for (int i = 0; i < ItemsToAdd; i++)
-{
+        {
             int num = ItemList.Length - i - 1;
             while (num < 0)
             {
@@ -127,7 +127,7 @@ public class InfiniteScroll : MonoBehaviour
             isUpdated = false;
             scrollRect.velocity = OldVelocity;
         }
-        if(direction.x > 0)
+        if (direction.x > 0)
         {
             if (contentPanelTransform.localPosition.x > 0)
             {
@@ -161,7 +161,7 @@ public class InfiniteScroll : MonoBehaviour
                 isUpdated = true;
             }
         }
-        if(scrollRect.velocity.sqrMagnitude <= 1000f && MovementManager.Instance.moveStarted == false)
+        if (scrollRect.velocity.sqrMagnitude <= 1000f && MovementManager.Instance.moveStarted == false)
         {
             StopScrolling();
         }
@@ -174,6 +174,17 @@ public class InfiniteScroll : MonoBehaviour
             Destroy(item.gameObject);
         }
         viewPortTransform.localPosition = startPosOfViewPortTransform;
+
+    }
+    public void HideUnused(List<Transform> fruits)
+    {
+        foreach (Transform item in contentPanelTransform)
+        {
+            if (!fruits.Contains(item))
+                continue;
+            Image[] images = item.GetComponentsInChildren<Image>();
+            Array.ForEach(images, x => x.enabled = false); //To prevent layout group bug
+        }
 
     }
     public void SetInteraction(bool sts) => Array.ForEach(raycastObjects, x => x.raycastTarget = sts);
