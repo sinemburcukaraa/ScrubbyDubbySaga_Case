@@ -2016,10 +2016,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fruitItemPrefabs:
-  - {fileID: 6614131038165940797, guid: aeaf7297779e31d43836e9061358c9cc, type: 3}
-  - {fileID: 7903948711802885949, guid: ea7c1243f3468114290f6f8b7481eb42, type: 3}
-  - {fileID: 8474884511117183833, guid: e7c34e3cd1cc8954fadd08540b144aab, type: 3}
-  - {fileID: 3970395490742710112, guid: 1d5b46c13ad8af54199fb1d5119b5184, type: 3}
+  - {fileID: 3278043898705632252, guid: aeaf7297779e31d43836e9061358c9cc, type: 3}
+  - {fileID: 5131554159925336690, guid: ea7c1243f3468114290f6f8b7481eb42, type: 3}
+  - {fileID: 8215594728639864927, guid: e7c34e3cd1cc8954fadd08540b144aab, type: 3}
+  - {fileID: 6142727137079077075, guid: 1d5b46c13ad8af54199fb1d5119b5184, type: 3}
 --- !u!4 &1938928855
 Transform:
   m_ObjectHideFlags: 0
