@@ -215,7 +215,7 @@ public class MovementManager : MonoBehaviour
                 continue;
             }
             itemsInGrid.Add(item);
-
+          
             Vector2 screenPosOfItem = item.transform.position;
             tileGridPositions.Add(GridManager.Instance.grid.GetTileGridPosition(screenPosOfItem));
             snapPositions.Add(GridManager.Instance.grid.GetWorldPosByGridPos(tileGridPositions[tileGridPositions.Count - 1].x, tileGridPositions[tileGridPositions.Count - 1].y));

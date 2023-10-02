@@ -794,7 +794,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a42d6d0dd533d241a3addab33328de1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemGrid: {fileID: 0}
+  itemGrid: {fileID: 114442754}
 --- !u!4 &643025354
 Transform:
   m_ObjectHideFlags: 0
@@ -918,6 +918,8 @@ MonoBehaviour:
     greenCount: 0
     blueCount: 8
     orangeCount: 0
+  nextLevelCount: 0
+  ItemGrid: {fileID: 114442754}
   redC: 0
   greenC: 0
   blueC: 0

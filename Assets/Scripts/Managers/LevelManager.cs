@@ -6,7 +6,7 @@ using DG.Tweening;
 public class LevelManager : MonoBehaviour
 {
     public List<Levels> levels = new List<Levels>();
-    int nextLevelCount = 0;
+    public int nextLevelCount;
     public ItemGrid ItemGrid;
     public int redC, greenC, blueC, orangeC;
 
@@ -21,21 +21,14 @@ public class LevelManager : MonoBehaviour
     }
     #endregion
 
-    //private void Start()
-    //{
-
-    //    DOVirtual.DelayedCall(1, () =>
-    //    {
-    //    });
-
-    //}
 
     public void NextLevel()
     {
+
         if (nextLevelCount < levels.Count - 1)
         {
             nextLevelCount++;
-
+            print("next level");
         }
         else
         {

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class MatchControl : MonoBehaviour
         while (IsThereAnyMatch())
         {
             CheckMatches();
-            yield return GridManager.Instance.emptySpaces.FillSpaces(itemGrid, itemGrid.gridSizeHeight, itemGrid.gridSizeWidth);
+            yield return StartCoroutine(GridManager.Instance.emptySpaces.FillSpaces(itemGrid, itemGrid.gridSizeHeight, itemGrid.gridSizeWidth));
             yield return null;
         }
         MovementManager.Instance.ActivateInput();
@@ -134,6 +135,7 @@ public class MatchControl : MonoBehaviour
                 LevelManager.instance.redC++;
                 break;
         }
+
         LevelManager.instance.CorrectMatchCompleted();
     }
 }

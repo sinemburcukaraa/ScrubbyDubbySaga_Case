@@ -8,6 +8,7 @@ public class FruitItem : MonoBehaviour
     public Vector2Int myPos;
     public RectTransform myRect;
 
+    
     private void Awake()
     {
         myRect = GetComponent<RectTransform>();
