@@ -15,14 +15,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        CanvasControl(false);
+        GamePanel(false);
     }
-    public void win()
+    public void Win()
     {
-        CanvasControl(true);
+        GamePanel(true);
     }
 
-    private void CanvasControl(bool control)
+    private void GamePanel(bool control)
     {
         gamePanel.SetActive(!control);
         winPanel.SetActive(control);

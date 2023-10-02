@@ -134,5 +134,6 @@ public class MatchControl : MonoBehaviour
                 LevelManager.instance.redC++;
                 break;
         }
+        LevelManager.instance.CorrectMatchCompleted();
     }
 }

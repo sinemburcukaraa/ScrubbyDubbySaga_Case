@@ -118,12 +118,17 @@ public class MovementManager : MonoBehaviour
             int width = GridManager.Instance.grid.fixedWidth;
             for (int i = 0; i < width; i++) // Get All grids where the grids' y pos is equals to selected grid's y pos
             {
-                if (i >= GridManager.Instance.grid.fruitItemSlot.GetLength(0) ||
+                if (selectedItemPos.y >= 0 && selectedItemPos.y < GridManager.Instance.grid.fruitItemSlot.GetLength(1))
+                {
+                    if (i >= GridManager.Instance.grid.fruitItemSlot.GetLength(0) ||
                     selectedItemPos.y >= GridManager.Instance.grid.fruitItemSlot.GetLength(1))
-                    return;
-                if (GridManager.Instance.grid.fruitItemSlot[i, selectedItemPos.y] == null)
-                    continue;
-                itemsToMove.Add(GridManager.Instance.grid.fruitItemSlot[i, selectedItemPos.y]);
+                        return;
+                    if (GridManager.Instance.grid.fruitItemSlot[i, selectedItemPos.y] == null)
+                        continue;
+                    itemsToMove.Add(GridManager.Instance.grid.fruitItemSlot[i, selectedItemPos.y]);
+
+                }
+
             }
         }
         else if (direction.y > 0) // If direction is Vertical
@@ -169,7 +174,7 @@ public class MovementManager : MonoBehaviour
     {
         if (moveEndedCOStarted == true)
             return;
- 
+
         moveStarted = false;
         directionCalculated = false;
         curCoolDown = 0;
